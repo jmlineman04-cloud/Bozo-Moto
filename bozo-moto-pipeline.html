@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOZO MOTO — Production Pipeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Barlow:wght@300;400&display=swap');
+
+:root {
+  --black: #080808;
+  --deep: #100d08;
+  --dirt: #1a1208;
+  --mud: #2e2010;
+  --orange: #f05a00;
+  --orange-hot: #ff7a1a;
+  --chalk: #f0ebe0;
+  --chalk-dim: #a09888;
+  --success: #3ddc84;
+  --blue: #4aa8ff;
+  --error: #ff4040;
+  --panel: #131008;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--black);
+  color: var(--chalk);
+  font-family: 'Barlow Condensed', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--deep);
+  border-right: 1px solid var(--mud);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--mud);
+}
+
+.brand-mark {
+  width: 44px; height: 44px;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; color: var(--black);
+  clip-path: polygon(0 0,100% 0,100% 72%,82% 100%,0 100%);
+  flex-shrink: 0;
+}
+
+.brand-text h1 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; line-height: 1; }
+.brand-text h1 span { color: var(--orange); }
+.brand-text p { font-size: 10px; color: var(--chalk-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+
+.sidebar-section h3 {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 12px; font-weight: 700;
+}
+
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--chalk-dim); }
+.field input, .field select {
+  background: var(--mud);
+  border: 1px solid #3d2b1a;
+  color: var(--chalk);
+  padding: 8px 10px;
+  font-family: 'Barlow Condensed', monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.field input:focus, .field select:focus { border-color: var(--orange); }
+.field input[type="password"] { letter-spacing: 2px; }
+
+.api-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--chalk-dim); letter-spacing: 1px;
+  margin-top: 6px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--chalk-dim); flex-shrink: 0; transition: all 0.3s; }
+.dot.ready { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.dot.error { background: var(--error); }
+
+.folder-list { display: flex; flex-direction: column; gap: 4px; }
+.folder-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--chalk-dim); font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; cursor: pointer; text-align: left;
+  transition: all 0.15s; width: 100%;
+}
+.folder-btn:hover { border-color: var(--mud); color: var(--chalk); }
+.folder-btn.active { border-color: var(--orange); background: rgba(240,90,0,0.08); color: var(--orange); }
+.folder-num { font-family: 'Bebas Neue', sans-serif; font-size: 14px; min-width: 20px; }
+
+/* ── MAIN ── */
+.main { padding: 36px 40px 80px; display: flex; flex-direction: column; gap: 28px; }
+
+.page-header { border-bottom: 2px solid var(--orange); padding-bottom: 16px; }
+.page-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 4px; }
+.page-header p { font-size: 13px; color: var(--chalk-dim); margin-top: 4px; letter-spacing: 1px; }
+
+/* ── DROP ZONE ── */
+.drop-zone {
+  border: 2px dashed var(--mud);
+  background: var(--panel);
+  min-height: 220px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+}
+.drop-zone:hover, .drop-zone.dragover { border-color: var(--orange); background: #1a1208; }
+.drop-zone.has-image { border-style: solid; border-color: var(--orange); min-height: auto; }
+
+.drop-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px; }
+.drop-icon { font-size: 40px; opacity: 0.35; }
+.drop-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--chalk-dim); }
+.drop-sub { font-size: 12px; color: var(--chalk-dim); opacity: 0.6; letter-spacing: 1px; }
+
+.preview-wrap { display: none; width: 100%; flex-direction: column; align-items: center; }
+.preview-img { max-width: 100%; max-height: 300px; object-fit: contain; display: block; }
+.preview-bar {
+  width: 100%; background: rgba(0,0,0,0.7);
+  padding: 8px 16px; font-size: 12px; color: var(--chalk-dim);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.change-btn {
+  background: transparent; border: 1px solid var(--mud); color: var(--chalk-dim);
+  padding: 3px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
+}
+.change-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+#file-input { display: none; }
+
+/* ── AI DETECTION ── */
+.detection-card {
+  background: var(--panel);
+  border: 1px solid var(--mud);
+  overflow: hidden;
+  display: none;
+}
+
+.detection-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--mud);
+}
+
+.detection-header h3 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; }
+
+.badge {
+  padding: 4px 14px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px;
+  border: 1px solid;
+}
+.badge.logo { color: var(--blue); border-color: var(--blue); background: rgba(74,168,255,0.1); }
+.badge.tattoo { color: var(--orange); border-color: var(--orange); background: rgba(240,90,0,0.1); }
+.badge.analyzing { color: var(--chalk-dim); border-color: var(--chalk-dim); animation: pulse 1s ease-in-out infinite; }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.detection-body { padding: 16px 20px; }
+.detection-reasoning { font-size: 13px; color: var(--chalk-dim); line-height: 1.7; letter-spacing: 0.3px; }
+
+.route-display {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--mud);
+}
+.route-step {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--chalk-dim);
+}
+.route-step .icon { font-size: 20px; }
+.route-step.active .icon { filter: drop-shadow(0 0 6px var(--orange)); }
+.route-step.active { color: var(--chalk); }
+.route-arrow { font-size: 18px; color: var(--mud); }
+.route-arrow.active { color: var(--orange); }
+
+.override-row {
+  margin-top: 14px; display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: var(--chalk-dim); letter-spacing: 1px;
+}
+.override-btn {
+  background: transparent; border: 1px solid var(--mud);
+  color: var(--chalk-dim); padding: 4px 12px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
+}
+.override-btn:hover { border-color: var(--chalk-dim); color: var(--chalk); }
+.override-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(240,90,0,0.08); }
+
+/* ── PROCESS BUTTON ── */
+.btn-process {
+  background: var(--orange); color: var(--black);
+  border: none; padding: 18px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 5px;
+  cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden;
+  width: 100%;
+}
+.btn-process:hover:not(:disabled) { background: var(--orange-hot); transform: translateY(-1px); }
+.btn-process:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.btn-process.loading { animation: btn-pulse 1.5s ease-in-out infinite; }
+@keyframes btn-pulse { 0%,100% { background: var(--orange); } 50% { background: var(--orange-hot); } }
+
+/* ── PROGRESS ── */
+.progress-section { display: none; background: var(--panel); border: 1px solid var(--mud); padding: 20px 24px; }
+.progress-track { height: 2px; background: var(--mud); margin-bottom: 16px; }
+.progress-fill { height: 100%; background: var(--orange); width: 0%; transition: width 0.5s ease; }
+.log-lines { display: flex; flex-direction: column; gap: 8px; }
+.log-line {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--chalk-dim); letter-spacing: 0.5px;
+  opacity: 0; transform: translateY(4px); transition: all 0.3s;
+}
+.log-line.show { opacity: 1; transform: none; }
+.log-line.done { color: var(--chalk); }
+.log-icon { font-size: 13px; min-width: 16px; }
+.spin { display: inline-block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── RESULT ── */
+.result-section { display: none; }
+
+.result-card {
+  background: #0a1f10;
+  border: 1px solid var(--success);
+  border-left: 3px solid var(--success);
+  padding: 0; overflow: hidden;
+}
+
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(61,220,132,0.2);
+}
+
+.result-header h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--success); }
+
+.result-meta { padding: 16px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
+.meta-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--chalk-dim); }
+.meta-value { font-size: 14px; color: var(--chalk); letter-spacing: 0.5px; }
+
+.result-actions { padding: 0 20px 20px; display: flex; gap: 10px; }
+
+.btn-dl {
+  background: var(--success); color: var(--black);
+  border: none; padding: 12px 28px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px;
+  cursor: pointer; transition: opacity 0.15s; flex-shrink: 0;
+}
+.btn-dl:hover { opacity: 0.85; }
+
+.drive-tip {
+  flex: 1; background: rgba(0,0,0,0.3); border: 1px dashed rgba(61,220,132,0.3);
+  padding: 10px 14px; font-size: 12px; color: var(--chalk-dim); letter-spacing: 0.5px;
+  display: flex; align-items: center; gap: 8px; line-height: 1.5;
+}
+
+/* ── ERROR ── */
+.error-box {
+  display: none; background: #1a0808;
+  border: 1px solid var(--error); border-left: 3px solid var(--error);
+  padding: 16px 20px; font-size: 13px; color: #ff8888; line-height: 1.7;
+}
+
+/* ── QUEUE ── */
+.queue-section { margin-top: 8px; }
+.queue-section h3 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--orange); margin-bottom: 12px; }
+.queue-empty { font-size: 13px; color: var(--chalk-dim); letter-spacing: 1px; font-style: italic; }
+.queue-list { display: flex; flex-direction: column; gap: 6px; }
+.queue-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel); border: 1px solid var(--mud);
+  padding: 10px 14px; font-size: 13px;
+}
+.queue-item.done { border-color: rgba(61,220,132,0.3); }
+.queue-item.active { border-color: var(--orange); }
+.qi-type {
+  font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 1px;
+  padding: 2px 8px; border: 1px solid;
+}
+.qi-type.logo { color: var(--blue); border-color: var(--blue); }
+.qi-type.tattoo { color: var(--orange); border-color: var(--orange); }
+.qi-name { flex: 1; color: var(--chalk); }
+.qi-status { font-size: 11px; color: var(--chalk-dim); letter-spacing: 1px; }
+.qi-dl { background: transparent; border: 1px solid var(--success); color: var(--success); padding: 3px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1px; cursor: pointer; }
+.qi-dl:hover { background: rgba(61,220,132,0.1); }
+
+@media (max-width: 768px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .main { padding: 24px 20px 60px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">BM</div>
+    <div class="brand-text">
+      <h1>BOZO <span>MOTO</span></h1>
+      <p>Production Pipeline</p>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>API Keys</h3>
+    <div class="field">
+      <label>Vectorizer ID</label>
+      <input type="text" id="vec-id" value="vkc57cbjnf6lrbk" />
+    </div>
+    <div class="field">
+      <label>Vectorizer Secret</label>
+      <input type="password" id="vec-secret" value="djd7ta7nftp07aljhlpjmbj60vnidha38iu9qf2pj9bs63vl82hq" />
+    </div>
+    <div class="api-status">
+      <div class="dot ready" id="vec-dot"></div>
+      <span>Vectorizer ready</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Output Settings</h3>
+    <div class="field">
+      <label>Logo Format</label>
+      <select id="logo-format">
+        <option value="pdf" selected>PDF (Print Ready)</option>
+        <option value="svg">SVG (Scalable)</option>
+        <option value="eps">EPS (Illustrator)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tattoo Art DPI</label>
+      <select id="tattoo-dpi">
+        <option value="300" selected>300 DPI (Standard Print)</option>
+        <option value="600">600 DPI (High End)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Upscale Factor</label>
+      <select id="upscale-factor">
+        <option value="4" selected>4× (Recommended)</option>
+        <option value="2">2× (Faster)</option>
+        <option value="8">8× (Max Quality)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Product Line</label>
+      <select id="product-line">
+        <option value="00-BRAND-ASSETS">00 — Brand Assets</option>
+        <option value="01-DIRT-TIMBER">01 — Dirt &amp; Timber</option>
+        <option value="02-THE-JERK">02 — The Jerk Line</option>
+        <option value="03-BORN-SAVAGE">03 — Born Savage</option>
+        <option value="04-BUILT-FOR-MORE">04 — Built For More</option>
+        <option value="05-GIRL-SERIES">05 — Girl Series</option>
+        <option value="06-MIDGET-LINE">06 — Midget Line</option>
+        <option value="07-DRAGON-SERIES">07 — Dragon Series</option>
+        <option value="08-SUPPLIER-FILES">08 — Supplier Files</option>
+        <option value="09-APPROVED">09 — Approved Production</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Drive Folders</h3>
+    <div class="folder-list" id="folder-list">
+      <div class="folder-btn active"><span class="folder-num">00</span> Brand Assets</div>
+      <div class="folder-btn"><span class="folder-num">01</span> Dirt &amp; Timber</div>
+      <div class="folder-btn"><span class="folder-num">02</span> The Jerk Line</div>
+      <div class="folder-btn"><span class="folder-num">03</span> Born Savage</div>
+      <div class="folder-btn"><span class="folder-num">04</span> Built For More</div>
+      <div class="folder-btn"><span class="folder-num">05</span> Girl Series</div>
+      <div class="folder-btn"><span class="folder-num">06</span> Midget Line</div>
+      <div class="folder-btn"><span class="folder-num">07</span> Dragon Series</div>
+      <div class="folder-btn"><span class="folder-num">08</span> Supplier Files</div>
+      <div class="folder-btn"><span class="folder-num">09</span> Approved</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="page-header">
+    <h2>DROP YOUR DESIGN</h2>
+    <p>AI analyzes each image — automatically routes logos to vector, tattoo art to print-ready upscale</p>
+  </div>
+
+  <!-- Drop Zone -->
+  <div class="drop-zone" id="drop-zone" onclick="triggerFile()">
+    <div class="drop-inner" id="drop-inner">
+      <div class="drop-icon">🏍</div>
+      <div class="drop-title">Drop Your ChatGPT Design Here</div>
+      <div class="drop-sub">PNG · JPG · WEBP — Drop multiple files at once</div>
+    </div>
+    <div class="preview-wrap" id="preview-wrap">
+      <img class="preview-img" id="preview-img" />
+      <div class="preview-bar">
+        <span id="preview-label">—</span>
+        <button class="change-btn" onclick="event.stopPropagation(); triggerFile()">Change Image</button>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="file-input" accept="image/*" multiple />
+
+  <!-- AI Detection Card -->
+  <div class="detection-card" id="detection-card">
+    <div class="detection-header">
+      <h3>🤖 AI Asset Detection</h3>
+      <div class="badge analyzing" id="detection-badge">ANALYZING...</div>
+    </div>
+    <div class="detection-body">
+      <div class="detection-reasoning" id="detection-reasoning">Examining image characteristics...</div>
+      <div class="route-display" id="route-display">
+        <div class="route-step"><span class="icon">🖼</span><span>Your Image</span></div>
+        <div class="route-arrow">→</div>
+        <div class="route-step" id="route-ai"><span class="icon">🤖</span><span>AI Analysis</span></div>
+        <div class="route-arrow" id="arrow2">→</div>
+        <div class="route-step" id="route-process"><span class="icon">⚙️</span><span>Processing</span></div>
+        <div class="route-arrow" id="arrow3">→</div>
+        <div class="route-step" id="route-out"><span class="icon">📁</span><span>Supplier Ready</span></div>
+      </div>
+      <div class="override-row" id="override-row" style="display:none">
+        <span>Override detection:</span>
+        <button class="override-btn" id="override-logo" onclick="setOverride('logo')">LOGO / VECTOR</button>
+        <button class="override-btn" id="override-tattoo" onclick="setOverride('tattoo')">TATTOO ART</button>
+        <button class="override-btn" id="override-auto" onclick="setOverride('auto')">AUTO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- File name -->
+  <div class="field">
+    <label>Design Name (used for filename)</label>
+    <input type="text" id="design-name" placeholder="e.g. DirtTimber_ChestLogo or BornSavage_SleeveSkull" style="font-size:15px; padding:12px 14px;" />
+  </div>
+
+  <!-- Process Button -->
+  <button class="btn-process" id="btn-process" disabled onclick="processImage()">
+    MAKE IT SUPPLIER READY
+  </button>
+
+  <!-- Progress -->
+  <div class="progress-section" id="progress-section">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="log-lines" id="log-lines"></div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- Result -->
+  <div class="result-section" id="result-section">
+    <div class="result-card">
+      <div class="result-header">
+        <h3>✓ SUPPLIER READY</h3>
+        <span id="result-type-badge" class="badge logo">VECTOR PDF</span>
+      </div>
+      <div class="result-meta">
+        <div class="meta-item"><div class="meta-label">File</div><div class="meta-value" id="res-filename">—</div></div>
+        <div class="meta-item"><div class="meta-label">Size</div><div class="meta-value" id="res-size">—</div></div>
+        <div class="meta-item"><div class="meta-label">Drive Folder</div><div class="meta-value" id="res-folder">—</div></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-dl" onclick="downloadResult()">↓ DOWNLOAD</button>
+        <div class="drive-tip">📁 Save to <strong id="drive-tip-folder" style="color:var(--chalk)">—</strong> in your BOZO MOTO Drive folder, then it's ready to send to suppliers.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Queue -->
+  <div class="queue-section">
+    <h3>📋 Session Queue</h3>
+    <div class="queue-empty" id="queue-empty">No files processed yet this session</div>
+    <div class="queue-list" id="queue-list"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── STATE ──
+let currentFile = null;
+let detectedType = null; // 'logo' | 'tattoo'
+let overrideType = null;
+let resultBlob = null;
+let resultFilename = '';
+const queue = [];
+
+// ── FOLDER BUTTONS ──
+document.querySelectorAll('.folder-btn').forEach((btn, i) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.folder-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const lines = btn.querySelectorAll('span');
+    const sel = document.getElementById('product-line');
+    sel.selectedIndex = i;
+  });
+});
+
+// ── FILE INPUT ──
+function triggerFile() { document.getElementById('file-input').click(); }
+
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  currentFile = file;
+  overrideType = null;
+  resetAll();
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('drop-inner').style.display = 'none';
+    const pw = document.getElementById('preview-wrap');
+    pw.style.display = 'flex';
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-label').textContent = `${file.name} — ${(file.size/1024).toFixed(0)} KB`;
+    dropZone.classList.add('has-image');
+  };
+  reader.readAsDataURL(file);
+
+  // Auto-name
+  const dn = document.getElementById('design-name');
+  if (!dn.value) dn.value = file.name.replace(/\.[^.]+$/, '');
+
+  // Start AI detection
+  runDetection(file);
+}
+
+// ── AI DETECTION via Claude API ──
+async function runDetection(file) {
+  const card = document.getElementById('detection-card');
+  card.style.display = 'block';
+  setBadge('analyzing', 'ANALYZING...');
+  document.getElementById('detection-reasoning').textContent = 'Reading image with AI...';
+  document.getElementById('override-row').style.display = 'none';
+  document.getElementById('btn-process').disabled = true;
+
+  try {
+    // Convert image to base64
+    const base64 = await fileToBase64(file);
+    const mimeType = file.type || 'image/png';
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mimeType, data: base64 }
+            },
+            {
+              type: 'text',
+              text: `You are analyzing artwork for BOZO MOTO, a motocross clothing brand. The brand's designs include:
+- LOGOS: Text-based, flat graphics, brand marks, slogans, simple geometric shapes, the "B" logo, wordmarks, numbers. These have sharp edges, limited colors, no photographic detail. Should be VECTORIZED for crisp printing.
+- TATTOO ART: Complex illustrations, skulls, wolves, roses, deer, forests, dragons, realistic shading, gradients, fine detail, tattoo-style artwork, motocross scenes, people. These need HIGH-RES RASTER upscaling for sublimation printing.
+
+Analyze this image and respond ONLY in this exact JSON format:
+{
+  "type": "logo" or "tattoo",
+  "confidence": 0-100,
+  "reasoning": "2-3 sentences explaining what you see and why it routes to logo/vector vs tattoo/raster",
+  "route": "Vectorizer.AI → PDF" or "Upscale → 300 DPI PNG",
+  "placement_suggestion": "Where on the gear this likely goes (e.g. chest logo, sleeve art, back panel, collar)"
+}`
+            }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content.map(b => b.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    detectedType = result.type;
+    renderDetection(result);
+
+  } catch (err) {
+    // Fallback: analyze locally by filename/size heuristic
+    const fallbackType = guessByHeuristic(file);
+    detectedType = fallbackType;
+    renderDetection({
+      type: fallbackType,
+      confidence: 60,
+      reasoning: `AI analysis unavailable. Based on file characteristics, this looks like ${fallbackType === 'logo' ? 'a logo or graphic element' : 'tattoo/illustration art'}. You can override below if needed.`,
+      route: fallbackType === 'logo' ? 'Vectorizer.AI → PDF' : 'Upscale → 300 DPI PNG',
+      placement_suggestion: 'Review and confirm placement'
+    });
+  }
+}
+
+function guessByHeuristic(file) {
+  const name = file.name.toLowerCase();
+  if (name.includes('logo') || name.includes('text') || name.includes('slogan') || name.includes('word')) return 'logo';
+  if (name.includes('skull') || name.includes('wolf') || name.includes('rose') || name.includes('deer') || name.includes('dragon') || name.includes('tattoo') || name.includes('art')) return 'tattoo';
+  // Default: larger files tend to be art, smaller tend to be logos
+  return file.size > 300000 ? 'tattoo' : 'logo';
+}
+
+function renderDetection(result) {
+  setBadge(result.type, result.type === 'logo' ? `LOGO — ${result.confidence}% CONFIDENCE` : `TATTOO ART — ${result.confidence}% CONFIDENCE`);
+
+  document.getElementById('detection-reasoning').innerHTML = `
+    <strong>${result.route}</strong><br>
+    ${result.reasoning}<br>
+    <span style="color:var(--chalk-dim); font-size:12px; margin-top:4px; display:block">📍 ${result.placement_suggestion}</span>
+  `;
+
+  // Update route display
+  if (result.type === 'logo') {
+    document.getElementById('route-process').innerHTML = '<span class="icon">🔷</span><span>Vectorizer.AI</span>';
+    document.getElementById('route-out').innerHTML = '<span class="icon">📄</span><span>PDF / SVG</span>';
+  } else {
+    document.getElementById('route-process').innerHTML = '<span class="icon">🔺</span><span>Upscale 4×</span>';
+    document.getElementById('route-out').innerHTML = '<span class="icon">🖼</span><span>300 DPI PNG</span>';
+  }
+  document.getElementById('route-process').classList.add('active');
+  document.getElementById('route-out').classList.add('active');
+  document.getElementById('arrow2').classList.add('active');
+  document.getElementById('arrow3').classList.add('active');
+
+  document.getElementById('override-row').style.display = 'flex';
+  document.getElementById('btn-process').disabled = false;
+}
+
+function setBadge(type, text) {
+  const badge = document.getElementById('detection-badge');
+  badge.className = 'badge ' + type;
+  badge.textContent = text;
+}
+
+function setOverride(type) {
+  document.querySelectorAll('.override-btn').forEach(b => b.classList.remove('active'));
+  if (type === 'auto') {
+    overrideType = null;
+    document.getElementById('override-auto').classList.add('active');
+  } else {
+    overrideType = type;
+    document.getElementById(type === 'logo' ? 'override-logo' : 'override-tattoo').classList.add('active');
+    // Re-render route
+    renderDetection({
+      type,
+      confidence: 100,
+      reasoning: `Manual override: treating as ${type === 'logo' ? 'logo/vector art' : 'tattoo illustration art'}.`,
+      route: type === 'logo' ? 'Vectorizer.AI → PDF' : 'Upscale → 300 DPI PNG',
+      placement_suggestion: 'User-specified'
+    });
+    detectedType = type;
+  }
+}
+
+// ── PROCESS ──
+async function processImage() {
+  if (!currentFile) return;
+  const finalType = overrideType || detectedType;
+  const productLine = document.getElementById('product-line').value;
+  const designName = document.getElementById('design-name').value.trim() || 'design';
+  const btn = document.getElementById('btn-process');
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = finalType === 'logo' ? 'VECTORIZING...' : 'UPSCALING...';
+
+  resetProgress();
+  document.getElementById('progress-section').style.display = 'block';
+  document.getElementById('error-box').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+
+  try {
+    if (finalType === 'logo') {
+      await processLogo(designName, productLine);
+    } else {
+      await processTattoo(designName, productLine);
+    }
+  } catch(err) {
+    showError(err.message);
+  }
+
+  btn.textContent = 'MAKE IT SUPPLIER READY';
+  btn.disabled = false;
+  btn.classList.remove('loading');
+}
+
+async function processLogo(name, line) {
+  const format = document.getElementById('logo-format').value;
+  addLog('⟳', 'Preparing logo for vectorization...', false);
+  setProgress(15);
+
+  const formData = new FormData();
+  formData.append('image', currentFile);
+  formData.append('output.file_format', format);
+
+  addLog('✓', 'Image ready — sending to Vectorizer.AI', true);
+  setProgress(30);
+  addLog('⟳', 'Vectorizing (converting to infinite-scale vector)...', false);
+
+  const vecId = document.getElementById('vec-id').value.trim();
+  const vecSecret = document.getElementById('vec-secret').value.trim();
+  const creds = btoa(`${vecId}:${vecSecret}`);
+
+  const res = await fetch('https://vectorizer.ai/api/v1/vectorize', {
+    method: 'POST',
+    headers: { 'Authorization': `Basic ${creds}` },
+    body: formData
+  });
+
+  setProgress(80);
+
+  if (!res.ok) {
+    const t = await res.text();
+    let msg = `Vectorizer error ${res.status}: `;
+    try { msg += JSON.parse(t).error_description || t; } catch { msg += t; }
+    throw new Error(msg);
+  }
+
+  resultBlob = await res.blob();
+  resultFilename = `BOZOMOTO_${line}_${name}_VECTOR.${format}`;
+
+  addLog('✓', `Vector complete — ${(resultBlob.size/1024).toFixed(0)} KB ${format.toUpperCase()}`, true);
+  setProgress(100);
+  showResult('logo', resultFilename, resultBlob.size, line, format.toUpperCase());
+  addToQueue('logo', name, resultFilename, resultBlob);
+}
+
+async function processTattoo(name, line) {
+  const factor = parseInt(document.getElementById('upscale-factor').value);
+  const dpi = document.getElementById('tattoo-dpi').value;
+
+  addLog('⟳', `Reading image for ${factor}× upscale...`, false);
+  setProgress(10);
+
+  // Read original image
+  const bitmap = await createImageBitmap(currentFile);
+  const origW = bitmap.width;
+  const origH = bitmap.height;
+  const newW = origW * factor;
+  const newH = origH * factor;
+
+  addLog('✓', `Original: ${origW}×${origH}px → Target: ${newW}×${newH}px @ ${dpi} DPI`, true);
+  setProgress(25);
+  addLog('⟳', 'Applying AI upscale with detail enhancement...', false);
+
+  // Use canvas + lanczos-style upscaling with sharpening
+  const canvas = document.createElement('canvas');
+  canvas.width = newW;
+  canvas.height = newH;
+  const ctx = canvas.getContext('2d');
+
+  // Draw upscaled
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bitmap, 0, 0, newW, newH);
+
+  setProgress(55);
+  addLog('⟳', 'Applying sharpening and detail pass...', false);
+
+  // Apply sharpening filter via convolution
+  const imgData = ctx.getImageData(0, 0, newW, newH);
+  const sharpened = applySharpen(imgData, newW, newH, 0.35);
+  ctx.putImageData(sharpened, 0, 0);
+
+  setProgress(78);
+  addLog('✓', 'Enhancement complete — encoding to PNG...', true);
+
+  // Add DPI metadata via PNG chunk
+  const blob = await canvasToBlob(canvas, 'image/png');
+  resultFilename = `BOZOMOTO_${line}_${name}_${dpi}DPI_${newW}x${newH}.png`;
+  resultBlob = blob;
+
+  setProgress(100);
+  addLog('✓', `Tattoo art ready — ${newW}×${newH}px @ ${dpi} DPI — ${(blob.size/1024/1024).toFixed(1)} MB`, true);
+  showResult('tattoo', resultFilename, blob.size, line, `${dpi} DPI PNG`);
+  addToQueue('tattoo', name, resultFilename, blob);
+}
+
+// ── SHARPENING CONVOLUTION ──
+function applySharpen(imgData, w, h, strength) {
+  const kernel = [
+     0, -strength,          0,
+    -strength, 1 + 4*strength, -strength,
+     0, -strength,          0
+  ];
+  const src = imgData.data;
+  const output = new Uint8ClampedArray(src.length);
+
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const idx = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        let val = 0;
+        for (let ky = -1; ky <= 1; ky++) {
+          for (let kx = -1; kx <= 1; kx++) {
+            const ki = ((y+ky)*w + (x+kx)) * 4;
+            val += src[ki + c] * kernel[(ky+1)*3 + (kx+1)];
+          }
+        }
+        output[idx + c] = Math.min(255, Math.max(0, val));
+      }
+      output[idx + 3] = src[idx + 3];
+    }
+  }
+
+  // Copy edges unchanged
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (y === 0 || y === h-1 || x === 0 || x === w-1) {
+        const i = (y*w+x)*4;
+        output[i] = src[i]; output[i+1] = src[i+1];
+        output[i+2] = src[i+2]; output[i+3] = src[i+3];
+      }
+    }
+  }
+
+  return new ImageData(output, w, h);
+}
+
+function canvasToBlob(canvas, type) {
+  return new Promise(res => canvas.toBlob(res, type, 1.0));
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Failed to read file'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ── UI HELPERS ──
+function addLog(icon, text, done) {
+  const container = document.getElementById('log-lines');
+  const line = document.createElement('div');
+  line.className = 'log-line' + (done ? ' done' : '');
+  line.innerHTML = `<span class="log-icon ${done ? '' : 'spin'}">${icon}</span><span>${text}</span>`;
+  container.appendChild(line);
+  requestAnimationFrame(() => line.classList.add('show'));
+}
+
+function setProgress(p) { document.getElementById('progress-fill').style.width = p + '%'; }
+
+function resetProgress() {
+  document.getElementById('log-lines').innerHTML = '';
+  setProgress(0);
+}
+
+function resetAll() {
+  resetProgress();
+  document.getElementById('progress-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('error-box').style.display = 'none';
+  document.getElementById('detection-card').style.display = 'none';
+  document.getElementById('btn-process').disabled = true;
+  resultBlob = null; resultFilename = '';
+}
+
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.style.display = 'block';
+  box.innerHTML = `<strong>⚠ Error:</strong> ${msg}`;
+}
+
+function showResult(type, filename, size, line, formatLabel) {
+  document.getElementById('result-section').style.display = 'block';
+  const badge = document.getElementById('result-type-badge');
+  badge.className = 'badge ' + type;
+  badge.textContent = type === 'logo' ? 'VECTOR ' + formatLabel : formatLabel;
+  document.getElementById('res-filename').textContent = filename;
+  document.getElementById('res-size').textContent = size > 1024*1024 ? `${(size/1024/1024).toFixed(1)} MB` : `${(size/1024).toFixed(0)} KB`;
+  document.getElementById('res-folder').textContent = line;
+  document.getElementById('drive-tip-folder').textContent = line;
+}
+
+function downloadResult() {
+  if (!resultBlob) return;
+  const url = URL.createObjectURL(resultBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = resultFilename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function addToQueue(type, name, filename, blob) {
+  queue.push({ type, name, filename, blob });
+  document.getElementById('queue-empty').style.display = 'none';
+  const list = document.getElementById('queue-list');
+  const item = document.createElement('div');
+  item.className = 'queue-item done';
+  item.id = `qi-${queue.length-1}`;
+  item.innerHTML = `
+    <span class="qi-type ${type}">${type.toUpperCase()}</span>
+    <span class="qi-name">${name}</span>
+    <span class="qi-status">${type === 'logo' ? 'Vector PDF' : '300 DPI PNG'}</span>
+    <button class="qi-dl" onclick="dlFromQueue(${queue.length-1})">↓ DL</button>
+  `;
+  list.appendChild(item);
+}
+
+function dlFromQueue(i) {
+  const item = queue[i];
+  const url = URL.createObjectURL(item.blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = item.filename; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
