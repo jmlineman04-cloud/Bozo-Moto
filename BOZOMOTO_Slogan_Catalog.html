@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOZO MOTO — Slogan Catalog</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400&display=swap');
+  
+  :root { --orange: #f05a00; --black: #0a0a0a; --chalk: #f0ebe0; --dim: #888; }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body { background: var(--black); color: var(--chalk); font-family: 'Barlow Condensed', sans-serif; padding: 0; }
+  
+  .top-bar {
+    background: var(--orange); padding: 12px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .top-bar h1 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--black); }
+  .save-btn {
+    background: var(--black); color: var(--orange); border: none;
+    padding: 8px 20px; font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; letter-spacing: 2px; cursor: pointer;
+  }
+  .save-btn:hover { background: #1a1a1a; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 48px 40px 100px; }
+
+  .doc-title { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 6px; color: var(--orange); text-align: center; margin-bottom: 8px; }
+  .doc-sub { font-size: 16px; color: var(--dim); text-align: center; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+  .doc-note { font-size: 12px; color: #555; text-align: center; font-style: italic; margin-bottom: 60px; }
+
+  .toc { background: #111; border: 1px solid #222; padding: 24px 32px; margin-bottom: 60px; }
+  .toc h3 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--orange); margin-bottom: 16px; }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .toc-item { font-size: 13px; letter-spacing: 1px; }
+  .toc-item a { color: var(--dim); text-decoration: none; transition: color 0.15s; }
+  .toc-item a:hover { color: var(--orange); }
+
+  .collection { margin-bottom: 80px; border-top: 3px solid var(--orange); padding-top: 32px; }
+  .collection-name { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 4px; color: var(--chalk); margin-bottom: 6px; }
+  .collection-identity { font-size: 14px; color: var(--dim); letter-spacing: 1px; font-style: italic; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+  
+  .slogans-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; font-weight: 700; }
+  
+  .slogan-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .slogan-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 10px 16px; background: #0f0f0f; border: 1px solid #1a1a1a;
+    transition: border-color 0.15s; cursor: pointer;
+  }
+  .slogan-item:hover { border-color: var(--orange); }
+  .slogan-item:hover .slogan-num { color: var(--orange); }
+  .slogan-num { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #333; min-width: 24px; margin-top: 1px; }
+  .slogan-text { font-size: 15px; letter-spacing: 0.5px; line-height: 1.4; }
+  .slogan-item.copied { border-color: #3ddc84; }
+  .slogan-item.copied .slogan-text::after { content: " ✓"; color: #3ddc84; font-size: 12px; }
+
+  .count-badge { display: inline-block; background: var(--orange); color: var(--black); font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 1px; padding: 2px 10px; margin-left: 12px; vertical-align: middle; }
+
+  @media print {
+    body { background: white; color: black; }
+    .top-bar { display: none; }
+    .collection-name { color: black; }
+    .slogan-item { background: white; border-color: #ddd; }
+    .slogan-num { color: #999; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>BOZO MOTO — SLOGAN CATALOG</h1>
+  <button class="save-btn" onclick="window.print()">🖨 PRINT / SAVE PDF</button>
+</div>
+
+<div class="container">
+
+  <div class="doc-title">BOZO MOTO</div>
+  <div class="doc-sub">Slogan Catalog — All Lines</div>
+  <div class="doc-note">Working Document · Click any slogan to copy it · Last updated June 2026</div>
+
+  <div class="toc">
+    <h3>📋 Collections</h3>
+    <div class="toc-grid">
+      <div class="toc-item"><a href="#core">01 — Bozo Moto Core</a></div>
+      <div class="toc-item"><a href="#dirt">02 — Dirt & Timber</a></div>
+      <div class="toc-item"><a href="#oldman">03 — Old Man Line</a></div>
+      <div class="toc-item"><a href="#jerk">04 — Jerk Line</a></div>
+      <div class="toc-item"><a href="#born">05 — Born Savage</a></div>
+      <div class="toc-item"><a href="#willbite">06 — Will Bite</a></div>
+      <div class="toc-item"><a href="#fatkid">07 — Fat Kid Series</a></div>
+      <div class="toc-item"><a href="#oldschool">08 — Old School Tribute</a></div>
+      <div class="toc-item"><a href="#valhalla">09 — Til Valhallar</a></div>
+      <div class="toc-item"><a href="#military">10 — Military Collection</a></div>
+    </div>
+  </div>
+
+  <div class="collection" id="core">
+    <div class="collection-name">BOZO MOTO CORE <span class="count-badge">2</span></div>
+    <div class="collection-identity">The foundation. All In. No Half Sends.</div>
+    <div class="slogans-label">Brand Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">ALL IN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">NO HALF SENDS.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="dirt">
+    <div class="collection-name">DIRT & TIMBER <span class="count-badge">15</span></div>
+    <div class="collection-identity">Mountain riders. Woods riders. Escape work. Ride more.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">MOTO LIFE. ALL IN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">BETTER TO BE DIRTY THAN AT WORK.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">WORK CAN WAIT. THE TRAILS CAN'T.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">CLOCKED OUT. THROTTLED UP.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">LEAVE MORE THAN TRACKS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">LOST IN THE WOODS. FOUND ON THE THROTTLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">MOUNTAINS. MUD. THROTTLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">THE MOUNTAINS ARE CALLING. WORK CAN WAIT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">THE BEST DAYS START IN THE WOODS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">OFFICE HOURS END AT THE TRAILHEAD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">DIRT THERAPY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">MOUNTAINS OVER MEETINGS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">13</span><span class="slogan-text">PTO STANDS FOR PIN IT THROTTLE OPEN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">14</span><span class="slogan-text">THE TRAILS DON'T CARE ABOUT YOUR DEADLINES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">15</span><span class="slogan-text">BUILT FOR THE BACKCOUNTRY.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="oldman">
+    <div class="collection-name">OLD MAN LINE <span class="count-badge">44</span></div>
+    <div class="collection-identity">Vet riders. Broken bodies. Still racing.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">STILL SENDING IT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">OVER 40. EVERYTHING HURTS. WE RIDE ANYWAY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">OLD AND MEAN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">DUST OFF THE COBWEBS AND TWIST.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">POWERED BY BAD DECISIONS AND IBUPROFEN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">MY BIKE EATS RACE FUEL. I EAT FIBER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">MY BIKE EATS RACE FUEL. I EAT WHATEVER WON'T GIVE ME HEARTBURN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">MY BIKE RUNS VP. I RUN ANTACIDS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">MY BIKE EATS RACE FUEL. MY ASS CAN'T HANDLE TACO BELL ANYMORE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">MY BIKE RUNS PREMIUM. MY STOMACH DOESN'T.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">MY BIKE EATS RACE FUEL. I READ FOOD LABELS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">I USED TO CHASE WOMEN. NOW I CHASE FIBER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">13</span><span class="slogan-text">FULL THROTTLE. HALF A BOTTLE OF METAMUCIL.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">14</span><span class="slogan-text">I CAN STILL SEND IT. I JUST CAN'T EAT SPICY FOOD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">15</span><span class="slogan-text">RACE FUEL FOR THE BIKE. BLOOD PRESSURE PILLS FOR THE RIDER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">16</span><span class="slogan-text">I'M NOT OLD. I'M PRE-OWNED.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">17</span><span class="slogan-text">YESTERDAY'S CRASH IS TODAY'S WEATHER FORECAST.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">18</span><span class="slogan-text">THE THROTTLE STILL WORKS. EVERYTHING ELSE IS QUESTIONABLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">19</span><span class="slogan-text">I DON'T BOUNCE ANYMORE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">20</span><span class="slogan-text">RECOVERY IS NOW A MULTI-DAY EVENT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">21</span><span class="slogan-text">IF YOU CAN READ THIS, HAND ME MY IBUPROFEN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">22</span><span class="slogan-text">MY RETIREMENT PLAN HAS HANDLEBARS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">23</span><span class="slogan-text">TOO OLD TO START. TOO STUBBORN TO QUIT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">24</span><span class="slogan-text">DOCTOR SAID STOP. I GOT A SECOND OPINION.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">25</span><span class="slogan-text">STILL FASTER THAN YOUR KID.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">26</span><span class="slogan-text">YOUTH IS TEMPORARY. SPEED IS FOREVER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">27</span><span class="slogan-text">OLD GUYS RULE. GRAVITY WINS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">28</span><span class="slogan-text">BAD DECISIONS. GREAT STORIES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">29</span><span class="slogan-text">I'VE GOT MORE TITANIUM THAN PATIENCE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">30</span><span class="slogan-text">RESPECT YOUR ELDERS. OR CHASE THEM.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">31</span><span class="slogan-text">YEARS DON'T SLOW ME DOWN. CRASHES DO.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">32</span><span class="slogan-text">STILL SENDING IT SINCE BEFORE YOU WERE BORN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">33</span><span class="slogan-text">YOUNG BUCKS. OLD WOLVES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">34</span><span class="slogan-text">EARNED EVERY SCAR.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">35</span><span class="slogan-text">AGE IS A NUMBER. THROTTLE IS A LIFESTYLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">36</span><span class="slogan-text">BUILT DIFFERENT. BROKEN EVERYWHERE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">37</span><span class="slogan-text">NOT WASHED UP. JUST WARMED UP.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">38</span><span class="slogan-text">MY WARRANTY EXPIRED YEARS AGO.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">39</span><span class="slogan-text">MY KNEES POP MORE THAN MY BIKE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">40</span><span class="slogan-text">I'M RUNNING ON CAFFEINE AND STUBBORNNESS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">41</span><span class="slogan-text">TOO OLD TO CARE. TOO FAST TO CATCH.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">42</span><span class="slogan-text">MY BODY SAID NO. THE THROTTLE SAID YES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">43</span><span class="slogan-text">YOUNG GUYS TALK. OLD GUYS HOLD TROPHIES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">44</span><span class="slogan-text">SORE TOMORROW. FULL THROTTLE TODAY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">45</span><span class="slogan-text">BAD KNEES. GOOD STORIES.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="jerk">
+    <div class="collection-name">JERK LINE <span class="count-badge">20</span></div>
+    <div class="collection-identity">Teen motocross culture. Loud. Fast. Problematic.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">BUILT DIFFERENT. MADE TO DESTROY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">SOME KIDS HAVE TO PLAY SOCCER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">WE DON'T FOLLOW. WE LEAD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">NOT HERE TO FIT IN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">HERE TO TAKE OVER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">IF IT OFFENDS YOU. GOOD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">LOUD. FAST. PROBLEMATIC.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">RAISED WILD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">MOM SAID BE NICE. I WENT RIDING INSTEAD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">NOT EVERY KID WAS MADE FOR TEAM SPORTS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">NO EXCUSES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">BUILT TO BREAK LIMITS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">13</span><span class="slogan-text">DETENTION BUILDS CHARACTER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">14</span><span class="slogan-text">TOO FAST FOR TIMEOUT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">15</span><span class="slogan-text">GOOD KIDS PLAY SPORTS. GREAT KIDS RACE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">16</span><span class="slogan-text">BORN TO BE A PROBLEM.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">17</span><span class="slogan-text">IF YOU DON'T LIKE ME. GET FASTER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">18</span><span class="slogan-text">I'M THE REASON THERE'S A RIDER MEETING.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">19</span><span class="slogan-text">TROUBLE FINDS ME FAST.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">20</span><span class="slogan-text">STAY MAD.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="born">
+    <div class="collection-name">BORN SAVAGE <span class="count-badge">17</span></div>
+    <div class="collection-identity">Future racers. Small riders. Big attitude.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">BORN SAVAGE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">SMALL BIKE. BIG ATTITUDE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">THE TROUBLE STARTS EARLY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">BIG GOGGLES. BIG DREAMS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">THROTTLE IN ONE HAND. SUCKER IN THE OTHER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">DIRT FIRST. BATH LATER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">FUTURE CHAMPION. CURRENTLY COVERED IN MUD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">LITTLE BIKE. BIG SENDS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">STICKY FINGERS. FULL THROTTLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">POCKET FULL OF CANDY. HELMET FULL OF DREAMS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">SUGARED UP. THROTTLED UP.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">FUELED BY JUICE BOXES AND POOR DECISIONS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">13</span><span class="slogan-text">TOO YOUNG TO QUIT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">14</span><span class="slogan-text">FULL THROTTLE. HALF THE SIZE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">15</span><span class="slogan-text">SEE DIRT. SEND IT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">16</span><span class="slogan-text">IF THE GOGGLES FIT. SEND IT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">17</span><span class="slogan-text">EARN YOUR FIRST TROPHY.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="willbite">
+    <div class="collection-name">WILL BITE <span class="count-badge">10</span></div>
+    <div class="collection-identity">Bozo Dog. Loyalty. Attitude.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">WILL BITE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">APPROACH AT YOUR OWN RISK.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">BAD DOG. GOOD RIDER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">BARK LESS. TWIST MORE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">BITE FIRST. ASK LATER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">OFF LEASH.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">LOYAL TO FEW.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">RUN FAST. BITE HARD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">SOME DOGS FETCH. THIS ONE SENDS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">TEETH OUT. THROTTLE OPEN.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="fatkid">
+    <div class="collection-name">FAT KID SERIES <span class="count-badge">12</span></div>
+    <div class="collection-identity">Funny. Confident. Self-aware.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">FLUFFY & PROUD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">BIG APPETITE. BIGGER GAS TANK. BIGGEST HEART.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">EXTRA GRAVITY. EXTRA TRACTION.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">BIG BONED. BIG THROTTLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">FASTER THAN I LOOK.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">BUILT FOR SNACKS AND SENDS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">BIG APPETITE. BIG AIR.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">HEAVY ON HORSEPOWER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">MORE CUSHION FOR THE CRASHING.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">I'M NOT FAT. I'M BULK ORDERED.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">WIDE OPEN. EXTRA WIDE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">FUELED BY TACOS.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="oldschool">
+    <div class="collection-name">OLD SCHOOL TRIBUTE <span class="count-badge">13</span></div>
+    <div class="collection-identity">Motocross heritage. Built on dirt. Raised on risk.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">BUILT ON DIRT. RAISED ON RISK. RESPECT THE PAST.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">A TRIBUTE TO THE ONES WHO STARTED IT ALL.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">REAL GEAR. REAL BIKES. REAL STORIES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">OLD SCHOOL NEVER DIES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">LIVE FAST. RIDE HARD. ALL IN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">THEY DIDN'T HAVE BETTER BIKES. THEY WERE BETTER RIDERS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">THEY DIDN'T RIDE FOR LIKES. THEY RACED FOR TROPHIES.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">BEFORE SOCIAL MEDIA. THERE WAS RACE DAY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">NO APPS. NO TRACTION CONTROL. JUST THROTTLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">THEY BUILT THE SPORT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">RESPECT THE ROOTS.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">THE LEGENDS RODE FIRST.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">13</span><span class="slogan-text">THE PAST PAVED THE TRAIL.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="valhalla">
+    <div class="collection-name">TIL VALHALLAR <span class="count-badge">11</span></div>
+    <div class="collection-identity">Warrior spirit. Brotherhood. Legacy.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">TIL VALHALLAR.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">THE GRAVE GETS WHAT'S LEFT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">RIDE LIKE A WARRIOR.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">NO FEAR. NO RETREAT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">EARN YOUR SEAT IN VALHALLA.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">RIDE HARD. DIE EMPTY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">BROTHERS IN DIRT.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">BUILT FOR BATTLE.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">LEAVE NOTHING BEHIND.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">LIVE HARD. LEAVE A STORY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">DEATH CAN WAIT.</span></li>
+    </ul>
+  </div>
+
+  <div class="collection" id="military">
+    <div class="collection-name">MILITARY COLLECTION <span class="count-badge">15</span></div>
+    <div class="collection-identity">Service. Family. Sacrifice. Remembrance.</div>
+    <div class="slogans-label">Line Slogans</div>
+    <ul class="slogan-list">
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">01</span><span class="slogan-text">FAITH OVER FEAR.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">02</span><span class="slogan-text">HONOR THE FALLEN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">03</span><span class="slogan-text">NEVER FORGOTTEN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">04</span><span class="slogan-text">FOR THOSE WHO NEVER CAME HOME.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">05</span><span class="slogan-text">THE COST OF FREEDOM IS NEVER FORGOTTEN.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">06</span><span class="slogan-text">THEY SERVED. WE REMEMBER.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">07</span><span class="slogan-text">THE MISSION ENDS. THE BROTHERHOOD DOESN'T.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">08</span><span class="slogan-text">BEHIND EVERY VETERAN IS A FAMILY WHO SERVED TOO.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">09</span><span class="slogan-text">SERVICE BEFORE SELF.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">10</span><span class="slogan-text">DUTY. HONOR. COUNTRY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">11</span><span class="slogan-text">THEIR SACRIFICE. OUR FREEDOM.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">12</span><span class="slogan-text">THE FLAG FLIES BECAUSE THEY STOOD.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">13</span><span class="slogan-text">THANK YOU ISN'T ENOUGH.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">14</span><span class="slogan-text">WE WILL CARRY THEIR MEMORY.</span></li>
+      <li class="slogan-item" onclick="copySlogan(this)"><span class="slogan-num">15</span><span class="slogan-text">THEY GAVE TOMORROW FOR OUR TODAY.</span></li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function copySlogan(el) {
+  const text = el.querySelector('.slogan-text').textContent.replace(' ✓', '');
+  navigator.clipboard.writeText(text).then(() => {
+    el.classList.add('copied');
+    setTimeout(() => el.classList.remove('copied'), 1500);
+  });
+}
+</script>
+</body>
+</html>
