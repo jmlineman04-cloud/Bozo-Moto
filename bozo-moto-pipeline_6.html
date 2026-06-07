@@ -620,7 +620,6 @@ async function processTattoo(name,placement,line) {
   const startRes = await fetch(PROXY_URL, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${REPLICATE_TOKEN}`,
       'Content-Type': 'application/json',
       'X-Target': 'replicate-start'
     },
@@ -649,7 +648,7 @@ async function processTattoo(name,placement,line) {
     await new Promise(r => setTimeout(r, 2000));
     const pollRes = await fetch(`${PROXY_URL}?id=${result.id}`, {
       method: 'GET',
-      headers: { 'Authorization': `Bearer ${REPLICATE_TOKEN}`, 'X-Target': 'replicate-poll' }
+      headers: { 'X-Target': 'replicate-poll' }
     });
     result = await pollRes.json();
     attempts++;
